@@ -11,6 +11,7 @@ function Admin() {
   const [mensaje, setMensaje] = useState('');
   const navigate = useNavigate();
   const rol = localStorage.getItem('rol');
+  const token = localStorage.getItem('token');
 
 const cargarDatos = () => {
     fetch('http://localhost:3001/juegos')
@@ -25,45 +26,54 @@ const cargarDatos = () => {
   }, [rol, navigate]);
 
   const handleGuardar = async () => {
-    const res = await fetch(`http://localhost:3001/juegos/${editando.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ price: editando.price, stock: editando.stock })
-    });
-    if (res.ok) {
-      setJuegos(juegos.map(j => j.id === editando.id ? editando : j));
-      setEditando(null);
-      mostrarMensaje('✅ Juego actualizado');
-    }
-  };
+  const res = await fetch(`http://localhost:3001/juegos/${editando.id}`, {
+    method: 'PUT',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`  // ← agregado
+    },
+    body: JSON.stringify({ price: editando.price, stock: editando.stock })
+  });
+  if (res.ok) {
+    setJuegos(juegos.map(j => j.id === editando.id ? editando : j));
+    setEditando(null);
+    mostrarMensaje('✅ Juego actualizado');
+  }
+};
 
   const handleAgregarJuego = async (e) => {
-    e.preventDefault();
-    const res = await fetch('http://localhost:3001/juegos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(nuevoJuego)
-    });
-    if (res.ok) {
-      setNuevoJuego({ title: '', genre: '', price: '', stock: '', release_date: '', desarrollador_id: '' });
-      cargarDatos();
-      mostrarMensaje('✅ Juego agregado correctamente');
-    }
-  };
+  e.preventDefault();
+  const res = await fetch('http://localhost:3001/juegos', {
+    method: 'POST',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`  // ← agregado
+    },
+    body: JSON.stringify(nuevoJuego)
+  });
+  if (res.ok) {
+    setNuevoJuego({ title: '', genre: '', price: '', stock: '', release_date: '', desarrollador_id: '' });
+    cargarDatos();
+    mostrarMensaje('✅ Juego agregado correctamente');
+  }
+};
 
   const handleAgregarDesarrollador = async (e) => {
-    e.preventDefault();
-    const res = await fetch('http://localhost:3001/desarrolladores', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(nuevoDesarrollador)
-    });
-    if (res.ok) {
-      setNuevoDesarrollador({ nombre: '', pais: '' });
-      cargarDatos();
-      mostrarMensaje('✅ Desarrollador agregado correctamente');
-    }
-  };
+  e.preventDefault();
+  const res = await fetch('http://localhost:3001/desarrolladores', {
+    method: 'POST',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`  // ← agregado
+    },
+    body: JSON.stringify(nuevoDesarrollador)
+  });
+  if (res.ok) {
+    setNuevoDesarrollador({ nombre: '', pais: '' });
+    cargarDatos();
+    mostrarMensaje('✅ Desarrollador agregado correctamente');
+  }
+};
 
   const mostrarMensaje = (msg) => {
     setMensaje(msg);

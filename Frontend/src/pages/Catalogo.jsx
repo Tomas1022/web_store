@@ -19,7 +19,6 @@ const handleLogout = () => {
     navigate('/login');
 };
 const handleComprar = async (juego) => {
-  // Si no está logueado, redirige al login
   if (!usuario_id) {
     navigate('/login');
     return;
@@ -27,7 +26,10 @@ const handleComprar = async (juego) => {
 
   const res = await fetch('http://localhost:3001/compras', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    },
     body: JSON.stringify({
       usuario_id: usuario_id,
       juego_id: juego.id,

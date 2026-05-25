@@ -34,8 +34,8 @@ module.exports = { getAll, update };
 const create = (data) => {
     return new Promise((resolve, reject) => {
         db.query(
-            'INSERT INTO juegos (title, price, stock, desarrollador_id) VALUES (?, ?, ?, ?)',
-            [data.title, data.price, data.stock, data.desarrollador_id], (err, result) => {
+            'INSERT INTO juegos (title, genre, price, stock, desarrollador_id) VALUES (?, ?, ?, ?, ?)',
+            [data.title, data.genre, data.price, data.stock, data.desarrollador_id], (err, result) => {
                 if (err) reject(err);
                 else resolve(result);
             }
