@@ -80,6 +80,18 @@ const cargarDatos = () => {
     setTimeout(() => setMensaje(''), 3000);
   };
 
+  const handleEliminar = async (id) => {
+    if (!window.confirm('¿Confirma que desea eliminar este juego?')) return;
+    const res = await fetch(`http://localhost:3001/juegos/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }  // ← agregado
+    });
+    if (res.ok) {
+      setJuegos(juegos.filter(j => j.id !== id));
+      mostrarMensaje('✅ Juego eliminado correctamente');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <nav className="bg-gray-800 px-8 py-4 flex justify-between items-center shadow-lg">
@@ -137,31 +149,32 @@ const cargarDatos = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {juegos.map(juego => (
-                    <tr key={juego.id} className="border-t border-gray-700">
-                      <td className="px-6 py-4 font-semibold text-purple-400">{juego.title}</td>
-                      <td className="px-6 py-4 text-gray-300">{juego.genre}</td>
-                      {editando?.id === juego.id ? (
-                        <>
-                          <td className="px-6 py-4"><input type="number" value={editando.price} onChange={e => setEditando({...editando, price: e.target.value})} className="bg-gray-700 text-white px-3 py-1 rounded-lg w-24 focus:outline-none focus:ring-2 focus:ring-yellow-500" /></td>
-                          <td className="px-6 py-4"><input type="number" value={editando.stock} onChange={e => setEditando({...editando, stock: e.target.value})} className="bg-gray-700 text-white px-3 py-1 rounded-lg w-24 focus:outline-none focus:ring-2 focus:ring-yellow-500" /></td>
-                          <td className="px-6 py-4 flex gap-2">
-                            <button onClick={handleGuardar} className="bg-green-600 hover:bg-green-700 text-white text-sm px-3 py-1 rounded-lg">✅ Guardar</button>
-                            <button onClick={() => setEditando(null)} className="bg-gray-600 hover:bg-gray-500 text-white text-sm px-3 py-1 rounded-lg">Cancelar</button>
-                          </td>
-                        </>
-                      ) : (
-                        <>
-                          <td className="px-6 py-4 text-green-400">${juego.price}</td>
-                          <td className="px-6 py-4 text-gray-300">{juego.stock}</td>
-                          <td className="px-6 py-4">
-                            <button onClick={() => setEditando({...juego})} className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded-lg">Editar</button>
-                          </td>
-                        </>
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
+                {juegos.map(juego => (
+                  <tr key={juego.id} className="border-t border-gray-700">
+                    <td className="px-6 py-4 font-semibold text-purple-400">{juego.title}</td>
+                    <td className="px-6 py-4 text-gray-300">{juego.genre}</td>
+                    {editando?.id === juego.id ? (
+                      <>
+                        <td className="px-6 py-4"><input type="number" value={editando.price} onChange={e => setEditando({...editando, price: e.target.value})} className="bg-gray-700 text-white px-3 py-1 rounded-lg w-24 focus:outline-none focus:ring-2 focus:ring-yellow-500" /></td>
+                        <td className="px-6 py-4"><input type="number" value={editando.stock} onChange={e => setEditando({...editando, stock: e.target.value})} className="bg-gray-700 text-white px-3 py-1 rounded-lg w-24 focus:outline-none focus:ring-2 focus:ring-yellow-500" /></td>
+                        <td className="px-6 py-4 flex gap-2">
+                          <button onClick={handleGuardar} className="bg-green-600 hover:bg-green-700 text-white text-sm px-3 py-1 rounded-lg">✅ Guardar</button>
+                          <button onClick={() => setEditando(null)} className="bg-gray-600 hover:bg-gray-500 text-white text-sm px-3 py-1 rounded-lg">Cancelar</button>
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td className="px-6 py-4 text-green-400">${juego.price}</td>
+                        <td className="px-6 py-4 text-gray-300">{juego.stock}</td>
+                        <td className="px-6 py-4 flex gap-2">
+                          <button onClick={() => setEditando({...juego})} className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded-lg">Editar</button>
+                          <button onClick={() => handleEliminar(juego.id)} className="bg-red-600 hover:bg-red-700 text-white text-sm px-3 py-1 rounded-lg">Eliminar</button>
+                        </td>
+                      </>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
               </table>
             </div>
           </div>

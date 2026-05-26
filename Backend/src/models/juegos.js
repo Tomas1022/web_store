@@ -43,4 +43,13 @@ const create = (data) => {
     });
 };
 
-module.exports = { getAll, update, create: create };
+const remove = (id) => {
+    return new Promise((resolve, reject) => {
+        db.query('DELETE FROM juegos WHERE id = ?', [id], (err, result) => {
+            if (err) reject(err);
+            else resolve(result);
+        });
+    });
+};
+
+module.exports = { getAll, update, create: create, remove };

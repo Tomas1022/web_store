@@ -27,5 +27,14 @@ const create = async (req, res) => {
     }
 };
 
-module.exports = { getAll, update, create };
-module.exports = { getAll, update, create: create };
+const remove = async (req, res) => {
+    try {
+        const result = await JuegosModel.remove(req.params.id);
+        res.json({ mensaje: '✅ Juego eliminado correctamente' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+module.exports = { getAll, update, create, remove };
+
