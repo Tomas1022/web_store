@@ -20,7 +20,8 @@ const update = async (req, res) => {
 
 const create = async (req, res) => {
     try {
-        const result = await JuegosModel.create(req.body);
+        const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+        const result = await JuegosModel.create(req.body, imageUrl);
         res.json(result);
     } catch (err) {
         res.status(500).json({ error: err.message });

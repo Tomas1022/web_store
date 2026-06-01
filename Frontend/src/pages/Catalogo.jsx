@@ -92,9 +92,24 @@ return (
 
       {/* Catálogo */}
     <div className="p-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
         {juegosFiltrados.map(juego => (
-            <div key={juego.id} className="bg-gray-800 rounded-xl p-6 flex flex-col gap-3 shadow-lg hover:scale-105 transition-transform">
+        <div key={juego.id} className="bg-gray-800 rounded-xl overflow-hidden flex flex-col shadow-lg hover:scale-105 transition-transform">
+            {/* Imagen */}
+            {juego.imagen ? (
+            <img
+                src={`http://localhost:3001${juego.imagen}`}
+                alt={juego.title}
+                className="w-full h-48 object-cover"
+            />
+            ) : (
+            <div className="w-full h-48 bg-gray-700 flex items-center justify-center">
+                <span className="text-4xl">🎮</span>
+            </div>
+            )}
+
+            {/* Contenido */}
+            <div className="p-6 flex flex-col gap-3 flex-1">
             <h2 className="text-xl font-bold text-purple-400">{juego.title}</h2>
             <span className="text-sm bg-purple-900 text-purple-300 px-3 py-1 rounded-full w-fit">
                 {juego.genre}
@@ -110,8 +125,9 @@ return (
                 Comprar
             </button>
             </div>
-        ))}
         </div>
+        ))}
+    </div>
     </div>
     </div>
 );

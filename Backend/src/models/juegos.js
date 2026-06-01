@@ -29,15 +29,14 @@ const update = (id, data) => {
     });
 };
 
-module.exports = { getAll, update };
-
-const create = (data) => {
+const create = (data, imageUrl) => {
     return new Promise((resolve, reject) => {
         db.query(
-            'INSERT INTO juegos (title, genre, price, stock, desarrollador_id) VALUES (?, ?, ?, ?, ?)',
-            [data.title, data.genre, data.price, data.stock, data.desarrollador_id], (err, result) => {
+            'INSERT INTO juegos (title, genre, price, stock, release_date, desarrollador_id, imagen) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [data.title, data.genre, data.price, data.stock, data.release_date, data.desarrollador_id, imageUrl],
+            (err, result) => {
                 if (err) reject(err);
-                else resolve(result);
+                else resolve({ mensaje: '✅ Juego agregado correctamente', id: result.insertId });
             }
         );
     });

@@ -12,6 +12,9 @@ function Admin() {
   const navigate = useNavigate();
   const rol = localStorage.getItem('rol');
   const token = localStorage.getItem('token');
+  const [imagenFile, setImagenFile] = useState(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [preview, setPreview] = useState(null);
 
 const cargarDatos = () => {
     fetch('http://localhost:3001/juegos')
@@ -43,16 +46,29 @@ const cargarDatos = () => {
 
   const handleAgregarJuego = async (e) => {
   e.preventDefault();
+  
+  const formData = new FormData();
+  formData.append('title', nuevoJuego.title);
+  formData.append('genre', nuevoJuego.genre);
+  formData.append('price', nuevoJuego.price);
+  formData.append('stock', nuevoJuego.stock);
+  formData.append('release_date', nuevoJuego.release_date);
+  formData.append('desarrollador_id', nuevoJuego.desarrollador_id);
+  if (imagenFile) formData.append('imagen', imagenFile);
+
   const res = await fetch('http://localhost:3001/juegos', {
     method: 'POST',
     headers: { 
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`  // ← agregado
+      'Authorization': `Bearer ${token}`
+      // ⚠️ No pongas Content-Type aquí, FormData lo pone automáticamente
     },
-    body: JSON.stringify(nuevoJuego)
+    body: formData
   });
+
   if (res.ok) {
     setNuevoJuego({ title: '', genre: '', price: '', stock: '', release_date: '', desarrollador_id: '' });
+    setImagenFile(null);
+    setPreview(null);
     cargarDatos();
     mostrarMensaje('✅ Juego agregado correctamente');
   }
@@ -92,6 +108,38 @@ const cargarDatos = () => {
     }
   };
 
+  const handleDrop = (e) => {
+  e.preventDefault();
+  setDragOver(false);
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    setImagenFile(file);
+    setPreview(URL.createObjectURL(file));
+  }
+};
+  const handleDragOver = (e) => {
+  e.preventDefault();
+  setDragOver(true);
+};
+  const handleDragLeave = () => {
+  setDragOver(false);
+};
+const handleCambiarImagen = async (file, id) => {
+  if (!file) return;
+  const formData = new FormData();
+  formData.append('imagen', file);
+
+  const res = await fetch(`http://localhost:3001/juegos/${id}/imagen`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}` },
+    body: formData
+  });
+
+  if (res.ok) {
+    cargarDatos();
+    mostrarMensaje('✅ Imagen actualizada correctamente');
+  }
+};
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <nav className="bg-gray-800 px-8 py-4 flex justify-between items-center shadow-lg">
@@ -129,6 +177,38 @@ const cargarDatos = () => {
                     <option key={d.id} value={d.id}>{d.nombre}</option>
                   ))}
                 </select>
+                {/* Drag & Drop */}
+                <div
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onClick={() => document.getElementById('fileInput').click()}
+                  className={`col-span-2 border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+                    dragOver ? 'border-yellow-400 bg-yellow-900/20' : 'border-gray-600 hover:border-gray-400'
+                  }`}
+                >
+                  {preview ? (
+                    <img src={preview} alt="preview" className="h-40 mx-auto object-cover rounded-lg" />
+                  ) : (
+                    <div className="text-gray-400">
+                      <p className="text-3xl mb-2">🖼️</p>
+                      <p className="text-sm">Arrastra una imagen aquí o haz click para seleccionar</p>
+                    </div>
+                  )}
+                  <input
+                    id="fileInput"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={e => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        setImagenFile(file);
+                        setPreview(URL.createObjectURL(file));
+                      }
+                    }}
+                  />
+                </div>
                 <button type="submit" className="col-span-2 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-2 rounded-lg transition-colors">
                   Agregar Juego
                 </button>
@@ -149,32 +229,41 @@ const cargarDatos = () => {
                   </tr>
                 </thead>
                 <tbody>
-                {juegos.map(juego => (
-                  <tr key={juego.id} className="border-t border-gray-700">
-                    <td className="px-6 py-4 font-semibold text-purple-400">{juego.title}</td>
-                    <td className="px-6 py-4 text-gray-300">{juego.genre}</td>
-                    {editando?.id === juego.id ? (
-                      <>
-                        <td className="px-6 py-4"><input type="number" value={editando.price} onChange={e => setEditando({...editando, price: e.target.value})} className="bg-gray-700 text-white px-3 py-1 rounded-lg w-24 focus:outline-none focus:ring-2 focus:ring-yellow-500" /></td>
-                        <td className="px-6 py-4"><input type="number" value={editando.stock} onChange={e => setEditando({...editando, stock: e.target.value})} className="bg-gray-700 text-white px-3 py-1 rounded-lg w-24 focus:outline-none focus:ring-2 focus:ring-yellow-500" /></td>
-                        <td className="px-6 py-4 flex gap-2">
-                          <button onClick={handleGuardar} className="bg-green-600 hover:bg-green-700 text-white text-sm px-3 py-1 rounded-lg">✅ Guardar</button>
-                          <button onClick={() => setEditando(null)} className="bg-gray-600 hover:bg-gray-500 text-white text-sm px-3 py-1 rounded-lg">Cancelar</button>
-                        </td>
-                      </>
-                    ) : (
-                      <>
-                        <td className="px-6 py-4 text-green-400">${juego.price}</td>
-                        <td className="px-6 py-4 text-gray-300">{juego.stock}</td>
-                        <td className="px-6 py-4 flex gap-2">
-                          <button onClick={() => setEditando({...juego})} className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded-lg">Editar</button>
-                          <button onClick={() => handleEliminar(juego.id)} className="bg-red-600 hover:bg-red-700 text-white text-sm px-3 py-1 rounded-lg">Eliminar</button>
-                        </td>
-                      </>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
+                  {juegos.map(juego => (
+                    <tr key={juego.id} className="border-t border-gray-700">
+                      <td className="px-6 py-4 font-semibold text-purple-400">{juego.title}</td>
+                      <td className="px-6 py-4 text-gray-300">{juego.genre}</td>
+                      {editando?.id === juego.id ? (
+                        <>
+                          <td className="px-6 py-4"><input type="number" value={editando.price} onChange={e => setEditando({...editando, price: e.target.value})} className="bg-gray-700 text-white px-3 py-1 rounded-lg w-24 focus:outline-none focus:ring-2 focus:ring-yellow-500" /></td>
+                          <td className="px-6 py-4"><input type="number" value={editando.stock} onChange={e => setEditando({...editando, stock: e.target.value})} className="bg-gray-700 text-white px-3 py-1 rounded-lg w-24 focus:outline-none focus:ring-2 focus:ring-yellow-500" /></td>
+                          <td className="px-6 py-4 flex gap-2">
+                            <button onClick={handleGuardar} className="bg-green-600 hover:bg-green-700 text-white text-sm px-3 py-1 rounded-lg">✅ Guardar</button>
+                            <button onClick={() => setEditando(null)} className="bg-gray-600 hover:bg-gray-500 text-white text-sm px-3 py-1 rounded-lg">Cancelar</button>
+                            <label className="bg-yellow-600 hover:bg-yellow-700 text-white text-sm px-3 py-1 rounded-lg cursor-pointer">
+                              🖼️ Imagen
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={e => handleCambiarImagen(e.target.files[0], editando.id)}
+                              />
+                            </label>
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          <td className="px-6 py-4 text-green-400">${juego.price}</td>
+                          <td className="px-6 py-4 text-gray-300">{juego.stock}</td>
+                          <td className="px-6 py-4 flex gap-2">
+                            <button onClick={() => setEditando({...juego})} className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded-lg">Editar</button>
+                            <button onClick={() => handleEliminar(juego.id)} className="bg-red-600 hover:bg-red-700 text-white text-sm px-3 py-1 rounded-lg">Eliminar</button>
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
               </table>
             </div>
           </div>

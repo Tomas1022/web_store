@@ -6,6 +6,7 @@ const db = require('./src/db');
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static('uploads'));
 
 // Importar rutas
 const juegosRoutes = require('./src/routes/juegos');
