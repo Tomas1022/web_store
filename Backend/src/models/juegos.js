@@ -19,8 +19,8 @@ module.exports = { getAll };
 const update = (id, data) => {
     return new Promise((resolve, reject) => {
         db.query(  
-            'UPDATE juegos SET price = ?, stock = ? WHERE id = ?',
-            [data.price, data.stock, id],
+            'UPDATE juegos SET price = ?, stock = ?, title = ?, genre = ? WHERE id = ?',
+            [data.price, data.stock, data.title, data.genre, id],
             (err, result) => {
                 if (err) reject(err);
                 else resolve(result);
