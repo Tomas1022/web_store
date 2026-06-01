@@ -35,7 +35,7 @@ const cargarDatos = () => {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`  // ← agregado
     },
-    body: JSON.stringify({ price: editando.price, stock: editando.stock })
+    body: JSON.stringify({ price: editando.price, stock: editando.stock, title: editando.title, genre: editando.genre })
   });
   if (res.ok) {
     setJuegos(juegos.map(j => j.id === editando.id ? editando : j));
@@ -231,8 +231,20 @@ const handleCambiarImagen = async (file, id) => {
                 <tbody>
                   {juegos.map(juego => (
                     <tr key={juego.id} className="border-t border-gray-700">
-                      <td className="px-6 py-4 font-semibold text-purple-400">{juego.title}</td>
-                      <td className="px-6 py-4 text-gray-300">{juego.genre}</td>
+                      <td className="px-6 py-4">
+                        {editando?.id === juego.id ? (
+                          <input value={editando.title} onChange={e => setEditando({...editando, title: e.target.value})} className="bg-gray-700 text-white px-3 py-1 rounded-lg w-32 focus:outline-none focus:ring-2 focus:ring-yellow-500" />
+                        ) : (
+                          <span className="font-semibold text-purple-400">{juego.title}</span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        {editando?.id === juego.id ? (
+                          <input value={editando.genre} onChange={e => setEditando({...editando, genre: e.target.value})} className="bg-gray-700 text-white px-3 py-1 rounded-lg w-28 focus:outline-none focus:ring-2 focus:ring-yellow-500" />
+                        ) : (
+                          <span className="text-gray-300">{juego.genre}</span>
+                        )}
+                      </td>
                       {editando?.id === juego.id ? (
                         <>
                           <td className="px-6 py-4"><input type="number" value={editando.price} onChange={e => setEditando({...editando, price: e.target.value})} className="bg-gray-700 text-white px-3 py-1 rounded-lg w-24 focus:outline-none focus:ring-2 focus:ring-yellow-500" /></td>
