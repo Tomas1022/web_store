@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Registro from './pages/Registro';
 import Admin from './pages/Admin';
 import Historial from './pages/Historial';
+import Carrito from './pages/Carrito';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/registro" element={<Registro />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/historial" element={<Historial />} />
+        <Route path="/carrito" element={<Carrito />} />
       </Routes>
     </BrowserRouter>
   );

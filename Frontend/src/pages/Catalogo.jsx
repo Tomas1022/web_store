@@ -8,6 +8,9 @@ const nombre = localStorage.getItem('nombre');
 const rol = localStorage.getItem('rol');
 const usuario_id = localStorage.getItem('usuario_id');
 const [busqueda, setBusqueda] = useState('');
+const [modalCarrito, setModalCarrito] = useState(false);
+const [juegoAgregado, setJuegoAgregado] = useState(null);
+
 useEffect(() => {
     fetch('http://localhost:3001/juegos')
     .then(res => res.json())
@@ -18,13 +21,13 @@ const handleLogout = () => {
     localStorage.clear();
     navigate('/login');
 };
-const handleComprar = async (juego) => {
+const handleAgregarAlCarrito = async (juego) => {
     if (!usuario_id) {
     navigate('/login');
     return;
 }
 
-    const res = await fetch('http://localhost:3001/compras', {
+    const res = await fetch('http://localhost:3001/carrito', {
     method: 'POST',
     headers: { 
         'Content-Type': 'application/json',
@@ -40,10 +43,11 @@ const handleComprar = async (juego) => {
     const data = await res.json();
 
     if (res.ok) {
-    alert(`✅ Compraste ${juego.title} por $${data.precio_total}`);
+    setJuegoAgregado(juego);
+    setModalCarrito(true);
     } else {
     alert(`❌ ${data.error}`);
-    }
+}
 };
 const juegosFiltrados = juegos.filter(juego =>
     juego.title.toLowerCase().includes(busqueda.toLowerCase()) ||
@@ -64,6 +68,9 @@ return (
                 ⚙️ Admin
                 </button>
             )}
+            <button onClick={() => navigate('/carrito')} className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg transition-colors">
+                🛒 Carrito
+            </button>
             <button onClick={() => navigate('/historial')} className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg transition-colors">
                 🕒 Historial
             </button>
@@ -90,45 +97,56 @@ return (
         />
     </div>
 
-      {/* Catálogo */}
+    {/* Catálogo */}
     <div className="p-8">
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
         {juegosFiltrados.map(juego => (
         <div key={juego.id} className="bg-gray-800 rounded-xl overflow-hidden flex flex-col shadow-lg hover:scale-105 transition-transform">
-            {/* Imagen */}
             {juego.imagen ? (
-            <img
-                src={`http://localhost:3001${juego.imagen}`}
-                alt={juego.title}
-                className="w-full h-48 object-cover"
-            />
+            <img src={`http://localhost:3001${juego.imagen}`} alt={juego.title} className="w-full h-48 object-cover" />
             ) : (
             <div className="w-full h-48 bg-gray-700 flex items-center justify-center">
                 <span className="text-4xl">🎮</span>
             </div>
             )}
-
-            {/* Contenido */}
             <div className="p-6 flex flex-col gap-3 flex-1">
             <h2 className="text-xl font-bold text-purple-400">{juego.title}</h2>
-            <span className="text-sm bg-purple-900 text-purple-300 px-3 py-1 rounded-full w-fit">
-                {juego.genre}
-            </span>
-            <p className="text-gray-400 text-sm">
-                🏢 {juego.desarrollador} · {juego.pais}
-            </p>
+            <span className="text-sm bg-purple-900 text-purple-300 px-3 py-1 rounded-full w-fit">{juego.genre}</span>
+            <p className="text-gray-400 text-sm">🏢 {juego.desarrollador} · {juego.pais}</p>
             <div className="flex justify-between items-center mt-auto pt-4 border-t border-gray-700">
                 <span className="text-2xl font-bold text-green-400">${juego.price}</span>
                 <span className="text-sm text-gray-400">Stock: {juego.stock}</span>
             </div>
-            <button onClick={() => handleComprar(juego)} className="mt-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 rounded-lg transition-colors">
-                Comprar
+            <button onClick={() => handleAgregarAlCarrito(juego)} className="mt-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 rounded-lg transition-colors">
+                🛒 Agregar al Carrito
             </button>
             </div>
         </div>
         ))}
     </div>
     </div>
+
+    {/* Modal carrito */}
+    {modalCarrito && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+            <div className="bg-gray-800 rounded-xl p-8 max-w-sm w-full mx-4 shadow-2xl">
+            <div className="text-center mb-6">
+                <span className="text-5xl">🛒</span>
+                <h2 className="text-xl font-bold text-white mt-3">¡Agregado al carrito!</h2>
+                <p className="text-gray-400 mt-1">{juegoAgregado?.title}</p>
+            </div>
+            <div className="flex flex-col gap-3">
+                <button onClick={() => navigate('/carrito')} className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg transition-colors">
+                🛒 Ir al carrito
+                </button>
+                <button onClick={() => setModalCarrito(false)} className="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 rounded-lg transition-colors">
+                Seguir comprando
+                </button>
+            </div>
+            </div>
+        </div>
+        )}
+
     </div>
 );
 }
