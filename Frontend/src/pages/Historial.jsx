@@ -1,44 +1,67 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Historial() {
-  const [compras, setCompras] = useState([]);
+  const [recibos, setRecibos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const usuario_id = localStorage.getItem('usuario_id');
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
-    const fetchCompras = async () => {
-      try {
-        const res = await fetch(`http://localhost:3001/compras/${localStorage.getItem('usuario_id')}`);
-        const data = await res.json();
-        setCompras(data);
-      } catch (error) {
-        console.error('Error fetching compras:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    fetch(`http://localhost:3001/recibos/${usuario_id}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => { setRecibos(data); setLoading(false); });
+  }, [usuario_id, token]);
 
-    fetchCompras();
-  }, []);
-
-  if (loading) return <div className="text-center text-white">Cargando...</div>;
+  if (loading) return (
+    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+      <p>Cargando historial...</p>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
-      <h1 className="text-3xl font-bold text-center mb-8">📋 Historial de Compras</h1>
-      {compras.length === 0 ? (
-        <p className="text-center text-gray-400">No tienes compras realizadas.</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {compras.map((compra) => (
-            <div key={compra.id} className="bg-gray-800 rounded-xl p-6 shadow-lg">
-              <h2 className="text-xl font-bold text-purple-400">{compra.title}</h2>
-              <p className="text-gray-400">Cantidad: {compra.cantidad}</p>
-              <p className="text-green-400 font-bold">Total: ${parseFloat(compra.precio).toFixed(2)}</p>
-              <p className="text-sm text-gray-500">Fecha: {new Date(compra.fecha).toLocaleDateString()}</p>
-            </div>
-          ))}
-        </div>
-      )}
+    <div className="min-h-screen bg-gray-900 text-white">
+      <nav className="bg-gray-800 px-8 py-4 flex justify-between items-center shadow-lg">
+        <h1 className="text-xl font-bold text-blue-400">🕒 Historial de Compras</h1>
+        <button onClick={() => navigate('/')} className="bg-purple-600 hover:bg-purple-700 text-white text-sm px-4 py-2 rounded-lg transition-colors">
+          🎮 Volver al catálogo
+        </button>
+      </nav>
+
+      <div className="max-w-3xl mx-auto p-8">
+        {recibos.length === 0 ? (
+          <div className="text-center text-gray-400 mt-20">
+            <p className="text-5xl mb-4">🕒</p>
+            <p className="text-xl">No tienes compras realizadas</p>
+            <button onClick={() => navigate('/')} className="mt-6 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors">
+              Ver catálogo
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {recibos.map(recibo => (
+              <div key={recibo.id} className="bg-gray-800 rounded-xl p-6 flex justify-between items-center shadow-lg">
+                <div>
+                  <p className="text-white font-bold text-lg">Recibo #{recibo.id}</p>
+                  <p className="text-gray-400 text-sm">{new Date(recibo.fecha).toLocaleDateString()}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-green-400 font-bold text-xl">${parseFloat(recibo.total).toFixed(2)}</p>
+                  <button
+                    onClick={() => navigate(`/recibo/${recibo.id}`)}
+                    className="mt-2 bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Ver detalle →
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
