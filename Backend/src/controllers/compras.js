@@ -2,8 +2,7 @@ const comprasModel = require('../models/compras');
 
 const create = async (req, res) => {
     try {
-        const { usuario_id, juego_id, cantidad } = req.body;
-        const result = await comprasModel.create({ usuario_id, juego_id, cantidad });
+        const result = await comprasModel.create(req.body);
         res.json(result);
     } catch (err) {
         res.status(500).json({ error: err.message });

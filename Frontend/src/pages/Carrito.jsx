@@ -41,28 +41,47 @@ function Carrito() {
     };
 
     const handleComprar = async () => {
-        for (const item of items) {
+    // 1. Calcular total
+    const total = items.reduce((acc, item) => acc + parseFloat(item.price) * item.cantidad, 0);
+
+    // 2. Crear recibo
+    const reciboRes = await fetch('http://localhost:3001/recibos', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ usuario_id, total })
+    });
+    const reciboData = await reciboRes.json();
+    const recibo_id = reciboData.id;
+
+    // 3. Registrar cada compra con recibo_id
+    for (const item of items) {
         await fetch('http://localhost:3001/compras', {
             method: 'POST',
             headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
-            usuario_id,
-            juego_id: item.juego_id,
-            cantidad: item.cantidad
+                usuario_id,
+                juego_id: item.juego_id,
+                cantidad: item.cantidad,
+                recibo_id
             })
         });
-        }
+    }
 
-        await fetch(`http://localhost:3001/carrito/vaciar/${usuario_id}`, {
+    // 4. Vaciar carrito
+    await fetch(`http://localhost:3001/carrito/vaciar/${usuario_id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
-        });
+    });
 
-        navigate('/historial');
-    };
+    // 5. Redirigir al recibo
+    navigate(`/recibo/${recibo_id}`);
+};
 
     const total = items.reduce((acc, item) => acc + parseFloat(item.price) * item.cantidad, 0);
 

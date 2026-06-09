@@ -1,6 +1,6 @@
 const db = require('../db');
 
-const create = ({ usuario_id, juego_id, cantidad }) => {
+const create = ({ usuario_id, juego_id, cantidad, recibo_id }) => {
     return new Promise((resolve, reject) => {
         db.query('SELECT * FROM juegos WHERE id = ?', [juego_id], (err, results) => {
             if (err) return reject(err);
@@ -12,8 +12,8 @@ const create = ({ usuario_id, juego_id, cantidad }) => {
             const precio_total = juego.price * cantidad;
 
             db.query(
-                'INSERT INTO compras (usuario_id, juego_id, cantidad, precio) VALUES (?, ?, ?, ?)',
-                [usuario_id, juego_id, cantidad, precio_total],
+                'INSERT INTO compras (usuario_id, juego_id, cantidad, precio, recibo_id) VALUES (?, ?, ?, ?, ?)',
+                [usuario_id, juego_id, cantidad, precio_total, recibo_id],
                 (err) => {
                     if (err) return reject(err);
                     db.query(

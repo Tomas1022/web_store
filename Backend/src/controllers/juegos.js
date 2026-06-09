@@ -1,8 +1,8 @@
-const JuegosModel = require('../models/juegos');
+const juegosModel = require('../models/juegos');
 
 const getAll = async (req, res) => {
     try {
-        const juegos = await JuegosModel.getAll();
+        const juegos = await juegosModel.getAll();
         res.json(juegos);
 }   catch (err) {
         res.status(500).json({ error: err.message });
@@ -11,7 +11,7 @@ const getAll = async (req, res) => {
 
 const update = async (req, res) => {
     try {
-        const juegos = await JuegosModel.update(req.params.id, req.body);
+        const juegos = await juegosModel.update(req.params.id, req.body);
         res.json(juegos);
 }   catch (err) {
         res.status(500).json({ error: err.message });
@@ -21,7 +21,7 @@ const update = async (req, res) => {
 const create = async (req, res) => {
     try {
         const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
-        const result = await JuegosModel.create(req.body, imageUrl);
+        const result = await juegosModel.create(req.body, imageUrl);
         res.json(result);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -30,7 +30,7 @@ const create = async (req, res) => {
 
 const remove = async (req, res) => {
     try {
-        const result = await JuegosModel.remove(req.params.id);
+        const result = await juegosModel.remove(req.params.id);
         res.json({ mensaje: '✅ Juego eliminado correctamente' });
     } catch (err) {
         res.status(500).json({ error: err.message });

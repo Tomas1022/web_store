@@ -13,17 +13,18 @@ const add = ({ usuario_id, juego_id, cantidad }) => {
         });
     });
 };
+
 const getByUser = (usuario_id) => {
     return new Promise((resolve, reject) => {
         db.query(
-            `SELECT c.id, c.cantidad, j.title, j.price, j.imagen
+            `SELECT c.id, c.cantidad, j.id AS juego_id, j.title, j.price, j.imagen
             FROM carrito c
             INNER JOIN juegos j ON c.juego_id = j.id
             WHERE c.usuario_id = ?`,
             [usuario_id],
             (err, results) => {
-                if (err) return reject(err);
-                resolve(results);
+                if (err) reject(err);
+                else resolve(results);
             }
         );
     });
