@@ -15,6 +15,7 @@ const desarrolladoresRoutes = require('./src/routes/desarrolladores');
 const comprasRoutes = require('./src/routes/compras');
 const carritoRoutes = require('./src/routes/carrito');
 const recibosRoutes = require('./src/routes/recibos');
+const usuariosRoutes = require('./src/routes/usuarios');
 
 // Importar middleware
 const { verificarToken } = require('./src/middlewares/auth');
@@ -33,6 +34,7 @@ app.use('/desarrolladores', desarrolladoresRoutes);
 app.use('/compras', verificarToken, comprasRoutes);
 app.use('/carrito', verificarToken, carritoRoutes);
 app.use('/recibos', verificarToken, recibosRoutes);
+app.use('/usuarios', verificarToken, usuariosRoutes);
 
 
 const PORT = process.env.PORT || 3001;

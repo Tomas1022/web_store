@@ -74,6 +74,9 @@ return (
             <button onClick={() => navigate('/historial')} className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg transition-colors">
                 🕒 Historial
             </button>
+            <button onClick={() => navigate('/perfil')} className="bg-gray-600 hover:bg-gray-700 text-white text-sm px-4 py-2 rounded-lg transition-colors">
+                � Perfil
+            </button>
             <button onClick={handleLogout} className="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2 rounded-lg transition-colors">
                 Cerrar sesión
             </button>

@@ -6,6 +6,7 @@ import Admin from './pages/Admin';
 import Historial from './pages/Historial';
 import Carrito from './pages/Carrito';
 import Recibo from './pages/Recibo';
+import Perfil from './pages/Perfil';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/historial" element={<Historial />} />
         <Route path="/carrito" element={<Carrito />} />
         <Route path="/recibo/:id" element={<Recibo />} />
+        <Route path="/perfil" element={<Perfil />} />
       </Routes>
     </BrowserRouter>
   );
