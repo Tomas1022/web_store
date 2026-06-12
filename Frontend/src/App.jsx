@@ -7,6 +7,7 @@ import Historial from './pages/Historial';
 import Carrito from './pages/Carrito';
 import Recibo from './pages/Recibo';
 import Perfil from './pages/Perfil';
+import DetalleJuego from './pages/Detallesjuegos';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/carrito" element={<Carrito />} />
         <Route path="/recibo/:id" element={<Recibo />} />
         <Route path="/perfil" element={<Perfil />} />
+        <Route path="/juego/:id" element={<DetalleJuego />} />
       </Routes>
     </BrowserRouter>
   );

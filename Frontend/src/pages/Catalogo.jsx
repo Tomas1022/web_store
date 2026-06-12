@@ -74,8 +74,8 @@ return (
             <button onClick={() => navigate('/historial')} className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-lg transition-colors">
                 🕒 Historial
             </button>
-            <button onClick={() => navigate('/perfil')} className="bg-gray-600 hover:bg-gray-700 text-white text-sm px-4 py-2 rounded-lg transition-colors">
-                � Perfil
+            <button onClick={() => navigate('/perfil')} className="bg-gray-600 hover:bg-gray-500 text-white text-sm px-4 py-2 rounded-lg transition-colors">
+                👤 Perfil
             </button>
             <button onClick={handleLogout} className="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2 rounded-lg transition-colors">
                 Cerrar sesión
@@ -105,15 +105,23 @@ return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
         {juegosFiltrados.map(juego => (
         <div key={juego.id} className="bg-gray-800 rounded-xl overflow-hidden flex flex-col shadow-lg hover:scale-105 transition-transform">
-            {juego.imagen ? (
-            <img src={`http://localhost:3001${juego.imagen}`} alt={juego.title} className="w-full h-48 object-cover" />
-            ) : (
-            <div className="w-full h-48 bg-gray-700 flex items-center justify-center">
-                <span className="text-4xl">🎮</span>
+            {/* Imagen clickeable */}
+            <div onClick={() => navigate(`/juego/${juego.id}`)} className="cursor-pointer">
+              {juego.imagen ? (
+                <img src={`http://localhost:3001${juego.imagen}`} alt={juego.title} className="w-full h-48 object-cover" />
+              ) : (
+                <div className="w-full h-48 bg-gray-700 flex items-center justify-center">
+                  <span className="text-4xl">🎮</span>
+                </div>
+              )}
             </div>
-            )}
             <div className="p-6 flex flex-col gap-3 flex-1">
-            <h2 className="text-xl font-bold text-purple-400">{juego.title}</h2>
+            <h2
+              onClick={() => navigate(`/juego/${juego.id}`)}
+              className="text-xl font-bold text-purple-400 cursor-pointer hover:text-purple-300 transition-colors"
+            >
+              {juego.title}
+            </h2>
             <span className="text-sm bg-purple-900 text-purple-300 px-3 py-1 rounded-full w-fit">{juego.genre}</span>
             <p className="text-gray-400 text-sm">🏢 {juego.desarrollador} · {juego.pais}</p>
             <div className="flex justify-between items-center mt-auto pt-4 border-t border-gray-700">

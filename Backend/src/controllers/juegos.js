@@ -37,5 +37,13 @@ const remove = async (req, res) => {
     }
 };
 
-module.exports = { getAll, update, create, remove };
+const getById = async (req, res) => {
+    try {
+        const juego = await juegosModel.getById(req.params.id);
+        res.json(juego);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
 
+module.exports = { getAll, update, create, remove, getById };

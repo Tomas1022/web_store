@@ -9,7 +9,7 @@ router.get('/', JuegosController.getAll);
 router.put('/:id', JuegosController.update);
 router.post('/', verificarToken, upload.single('imagen'), JuegosController.create);
 router.delete('/:id', JuegosController.remove);
-
+router.get('/:id', JuegosController.getById);
 // Subir imagen
 router.post('/:id/imagen', verificarToken, upload.single('imagen'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No se subió ninguna imagen' });

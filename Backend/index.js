@@ -16,6 +16,7 @@ const comprasRoutes = require('./src/routes/compras');
 const carritoRoutes = require('./src/routes/carrito');
 const recibosRoutes = require('./src/routes/recibos');
 const usuariosRoutes = require('./src/routes/usuarios');
+const resenasRoutes = require('./src/routes/resenas');
 
 // Importar middleware
 const { verificarToken } = require('./src/middlewares/auth');
@@ -35,7 +36,7 @@ app.use('/compras', verificarToken, comprasRoutes);
 app.use('/carrito', verificarToken, carritoRoutes);
 app.use('/recibos', verificarToken, recibosRoutes);
 app.use('/usuarios', verificarToken, usuariosRoutes);
-
+app.use('/resenas', verificarToken, resenasRoutes);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
