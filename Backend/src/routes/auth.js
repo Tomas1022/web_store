@@ -76,13 +76,38 @@ router.post('/login', (req, res) => {
 
     const usuario = results[0];
 
-    // Verifica si el email está verificado
     if (!usuario.email_verificado)
       return res.status(401).json({ error: 'Debes verificar tu email antes de iniciar sesión' });
 
     const valido = await bcrypt.compare(password, usuario.password);
     if (!valido) return res.status(401).json({ error: 'Credenciales incorrectas' });
 
+    // Si tiene 2FA activado, no devuelve el token todavía
+    if (usuario.two_factor_enabled) {
+      return res.json({ 
+        requires2FA: true, 
+        usuario_id: usuario.id 
+      });
+    }
+
+    const token = jwt.sign(
+      { id: usuario.id, rol: usuario.rol, nombre: usuario.nombre },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.json({ token, rol: usuario.rol, nombre: usuario.nombre, id: usuario.id });
+  });
+});
+
+router.post('/token', (req, res) => {
+  const { usuario_id } = req.body;
+
+  db.query('SELECT * FROM usuarios WHERE id = ?', [usuario_id], (err, results) => {
+    if (err || results.length === 0)
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+
+    const usuario = results[0];
     const token = jwt.sign(
       { id: usuario.id, rol: usuario.rol, nombre: usuario.nombre },
       process.env.JWT_SECRET,

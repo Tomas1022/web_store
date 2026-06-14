@@ -18,7 +18,7 @@ const recibosRoutes = require('./src/routes/recibos');
 const usuariosRoutes = require('./src/routes/usuarios');
 const resenasRoutes = require('./src/routes/resenas');
 const passwordRoutes = require('./src/routes/password');
-
+const twofactorRoutes = require('./src/routes/twofactor');
 // Importar middleware
 const { verificarToken } = require('./src/middlewares/auth');
 
@@ -38,6 +38,7 @@ app.use('/carrito', verificarToken, carritoRoutes);
 app.use('/recibos', verificarToken, recibosRoutes);
 app.use('/usuarios', verificarToken, usuariosRoutes);
 app.use('/resenas', verificarToken, resenasRoutes);
+app.use('/2fa', verificarToken, twofactorRoutes);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

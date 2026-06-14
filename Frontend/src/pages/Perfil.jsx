@@ -13,6 +13,10 @@ function Perfil() {
     const [modalEliminar, setModalEliminar] = useState(false);
     const [passwordEliminar, setPasswordEliminar] = useState('');
     const [errorEliminar, setErrorEliminar] = useState('');
+    const [show2FA, setShow2FA] = useState(false);
+    const [qr2FA, setQr2FA] = useState(null);
+    const [codigo2FA, setCodigo2FA] = useState('');
+    const [mensaje2FA, setMensaje2FA] = useState('');
 
     useEffect(() => {
         fetch(`http://localhost:3001/usuarios/${usuario_id}`, {
@@ -86,6 +90,56 @@ function Perfil() {
         navigate('/login');
     } else {
         setErrorEliminar(data.error);
+    }
+    };
+
+    const handleActivar2FA = async () => {
+  const res = await fetch('http://localhost:3001/2fa/activar', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ usuario_id })
+  });
+  const data = await res.json();
+  if (res.ok) { setQr2FA(data.qr); setShow2FA(true); }
+};
+
+const handleVerificar2FA = async (e) => {
+  e.preventDefault();
+  const res = await fetch('http://localhost:3001/2fa/verificar', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ usuario_id, codigo: codigo2FA })
+  });
+  const data = await res.json();
+  if (res.ok) {
+    setShow2FA(false);
+    setQr2FA(null);
+    setCodigo2FA('');
+    setUsuario({...usuario, two_factor_enabled: true});
+    mostrarMensaje('✅ 2FA activado correctamente');
+  } else {
+    setMensaje2FA(data.error);
+  }
+};
+
+const handleDesactivar2FA = async () => {
+    const res = await fetch('http://localhost:3001/2fa/desactivar', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ usuario_id })
+    });
+    if (res.ok) {
+        setUsuario({...usuario, two_factor_enabled: false});
+        mostrarMensaje('✅ 2FA desactivado');
     }
     };
     return (
@@ -163,6 +217,61 @@ function Perfil() {
                 <button onClick={() => setEditando(true)} className="mt-4 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg transition-colors">
                     ✏️ Editar perfil
                 </button>
+                {/* Sección 2FA */}
+                    <div className="border-t border-gray-700 pt-6 mt-4">
+                    <h3 className="text-white font-semibold mb-4">🔒 Autenticación de dos factores</h3>
+
+                    {usuario.two_factor_enabled ? (
+                        <div className="flex justify-between items-center">
+                        <div>
+                            <p className="text-green-400 text-sm font-semibold">✅ 2FA activado</p>
+                            <p className="text-gray-400 text-xs">Tu cuenta está protegida con Google Authenticator</p>
+                        </div>
+                        <button onClick={handleDesactivar2FA} className="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2 rounded-lg transition-colors">
+                            Desactivar
+                        </button>
+                        </div>
+                    ) : (
+                        <div className="flex justify-between items-center">
+                        <div>
+                            <p className="text-gray-300 text-sm">2FA desactivado</p>
+                            <p className="text-gray-400 text-xs">Agrega una capa extra de seguridad</p>
+                        </div>
+                        <button onClick={handleActivar2FA} className="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded-lg transition-colors">
+                            Activar
+                        </button>
+                        </div>
+                    )}
+
+                    {/* Modal QR */}
+                    {show2FA && (
+                        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+                        <div className="bg-gray-800 rounded-xl p-8 max-w-sm w-full mx-4 shadow-2xl">
+                            <h2 className="text-xl font-bold text-white text-center mb-2">Escanea el QR</h2>
+                            <p className="text-gray-400 text-sm text-center mb-6">Abre Google Authenticator y escanea este código</p>
+                            {qr2FA && <img src={qr2FA} alt="QR 2FA" className="mx-auto mb-6 rounded-lg" />}
+                            {mensaje2FA && <div className="bg-red-900 text-red-300 px-4 py-3 rounded-lg mb-4 text-sm">{mensaje2FA}</div>}
+                            <form onSubmit={handleVerificar2FA} className="flex flex-col gap-4">
+                            <input
+                                type="text"
+                                value={codigo2FA}
+                                onChange={e => setCodigo2FA(e.target.value)}
+                                placeholder="123456"
+                                maxLength={6}
+                                required
+                                className="w-full bg-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-center text-2xl tracking-widest"
+                            />
+                            <button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg transition-colors">
+                                Verificar y activar
+                            </button>
+                            <button type="button" onClick={() => { setShow2FA(false); setQr2FA(null); setMensaje2FA(''); }} className="text-gray-400 hover:text-white text-sm transition-colors">
+                                Cancelar
+                            </button>
+                            </form>
+                        </div>
+                        </div>
+                    )}
+</div>
                 <button onClick={() => setModalEliminar(true)} className="mt-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition-colors">
                     🗑️ Eliminar cuenta
                 </button>
