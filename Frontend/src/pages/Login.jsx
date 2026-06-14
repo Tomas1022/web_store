@@ -93,6 +93,11 @@ function Login() {
             Regístrate
           </a>
         </p>
+        <p className="text-center text-gray-400 mt-4 text-sm">
+        <span onClick={() => navigate('/olvide-password')} className="text-purple-400 cursor-pointer hover:underline">
+          ¿Olvidaste tu contraseña?
+        </span>
+        </p>
       </div>
     </div>
   );

@@ -8,6 +8,8 @@ import Carrito from './pages/Carrito';
 import Recibo from './pages/Recibo';
 import Perfil from './pages/Perfil';
 import DetalleJuego from './pages/Detallesjuegos';
+import OlvidePassword from './pages/OlvidePassword';
+import VerificarEmail from './pages/VerificarEmail';
 
 function App() {
   return (
@@ -22,6 +24,9 @@ function App() {
         <Route path="/recibo/:id" element={<Recibo />} />
         <Route path="/perfil" element={<Perfil />} />
         <Route path="/juego/:id" element={<DetalleJuego />} />
+        <Route path="/olvide-password" element={<OlvidePassword />} />
+        <Route path="/verificar-email" element={<VerificarEmail />} />
+        
       </Routes>
     </BrowserRouter>
   );

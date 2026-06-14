@@ -17,6 +17,7 @@ const carritoRoutes = require('./src/routes/carrito');
 const recibosRoutes = require('./src/routes/recibos');
 const usuariosRoutes = require('./src/routes/usuarios');
 const resenasRoutes = require('./src/routes/resenas');
+const passwordRoutes = require('./src/routes/password');
 
 // Importar middleware
 const { verificarToken } = require('./src/middlewares/auth');
@@ -30,7 +31,7 @@ app.get('/', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/juegos', juegosRoutes);
 app.use('/desarrolladores', desarrolladoresRoutes);
-
+app.use('/password', passwordRoutes);
 // Rutas protegidas
 app.use('/compras', verificarToken, comprasRoutes);
 app.use('/carrito', verificarToken, carritoRoutes);
