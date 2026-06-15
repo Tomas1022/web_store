@@ -10,6 +10,10 @@ import Perfil from './pages/Perfil';
 import DetalleJuego from './pages/Detallesjuegos';
 import OlvidePassword from './pages/OlvidePassword';
 import VerificarEmail from './pages/VerificarEmail';
+import PagoExitoso from './pages/PagoExitoso';
+import PagoFallido from './pages/PagoFallido';
+import PagoPendiente from './pages/PagoPendiente';
+
 
 function App() {
   return (
@@ -26,7 +30,9 @@ function App() {
         <Route path="/juego/:id" element={<DetalleJuego />} />
         <Route path="/olvide-password" element={<OlvidePassword />} />
         <Route path="/verificar-email" element={<VerificarEmail />} />
-        
+        <Route path="/pago-exitoso" element={<PagoExitoso />} />
+        <Route path="/pago-fallido" element={<PagoFallido />} />
+        <Route path="/pago-pendiente" element={<PagoPendiente />} />
       </Routes>
     </BrowserRouter>
   );

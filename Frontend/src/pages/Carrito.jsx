@@ -90,6 +90,23 @@ function Carrito() {
         <p>Cargando carrito...</p>
         </div>
     );
+    const handlePagarMP = async () => {
+    const res = await fetch('http://localhost:3001/pagos/crear-preferencia', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ items, usuario_id })
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+        window.location.href = data.init_point; // redirige a MercadoPago
+    } else {
+        alert(`❌ ${data.error}`);
+    }
+};
 
     return (
         <div className="min-h-screen bg-gray-900 text-white">
@@ -155,16 +172,20 @@ function Carrito() {
                     </div>
                 ))}
                 </div>
-
                 {/* Total y botón comprar */}
                 <div className="bg-gray-800 rounded-xl p-6 flex justify-between items-center">
                 <div>
                     <p className="text-gray-400 text-sm">Total</p>
                     <p className="text-3xl font-bold text-green-400">${total.toFixed(2)}</p>
                 </div>
-                <button onClick={handleComprar} className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-4 rounded-xl text-lg transition-colors">
+                <div className="flex flex-col gap-3">
+                    <button onClick={handleComprar} className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-4 rounded-xl text-lg transition-colors">
                     ✅ Finalizar compra
-                </button>
+                    </button>
+                    <button onClick={handlePagarMP} className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-8 py-4 rounded-xl text-lg transition-colors">
+                    💳 Pagar con MercadoPago
+                    </button>
+                </div>
                 </div>
             </>
             )}

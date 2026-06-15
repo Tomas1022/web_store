@@ -19,7 +19,7 @@ const usuariosRoutes = require('./src/routes/usuarios');
 const resenasRoutes = require('./src/routes/resenas');
 const passwordRoutes = require('./src/routes/password');
 const twofactorRoutes = require('./src/routes/twofactor');
-// Importar middleware
+const pagosRoutes = require('./src/routes/pagos');
 const { verificarToken } = require('./src/middlewares/auth');
 
 // Ruta de prueba
@@ -32,6 +32,7 @@ app.use('/auth', authRoutes);
 app.use('/juegos', juegosRoutes);
 app.use('/desarrolladores', desarrolladoresRoutes);
 app.use('/password', passwordRoutes);
+app.use('/pagos', pagosRoutes); // público para el webhook
 // Rutas protegidas
 app.use('/compras', verificarToken, comprasRoutes);
 app.use('/carrito', verificarToken, carritoRoutes);
@@ -39,6 +40,7 @@ app.use('/recibos', verificarToken, recibosRoutes);
 app.use('/usuarios', verificarToken, usuariosRoutes);
 app.use('/resenas', verificarToken, resenasRoutes);
 app.use('/2fa', verificarToken, twofactorRoutes);
+app.use('/pagos', verificarToken, pagosRoutes);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

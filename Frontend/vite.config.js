@@ -7,4 +7,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  server: {
+    allowedHosts: ['omnivore-basin-custody.ngrok-free.dev']
+  }
 })
