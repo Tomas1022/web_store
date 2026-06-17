@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { MercadoPagoConfig, Preference } = require('mercadopago');
+const db = require('../db');
 
 const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN
@@ -110,7 +111,7 @@ const response = await preference.create({
     },
     auto_return: 'approved',
     external_reference: usuario_id.toString(),
-    notification_url: 'https://TU_URL_NGROK_BACKEND/pagos/webhook' // ← ngrok del backend
+    notification_url: 'https://TU_URL_NGROK_BACKEND/pagos/webhook'
   }
 });
 
