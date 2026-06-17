@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { MercadoPagoConfig, Preference } = require('mercadopago');
+const { MercadoPagoConfig, Preference, Payment } = require('mercadopago');
 const db = require('../db');
 
 const client = new MercadoPagoConfig({
@@ -14,22 +14,23 @@ router.post('/crear-preferencia', async (req, res) => {
     const preference = new Preference(client);
 
     const response = await preference.create({
-  body: {
-    items: items.map(item => ({
-      title: item.title,
-      quantity: Number(item.cantidad),
-      unit_price: Math.round(parseFloat(item.price)),  // ← redondea a entero
-      currency_id: 'COP'
-    })),
-    back_urls: {
-      success: 'https://omnivore-basin-custody.ngrok-free.dev/pago-exitoso',
-      failure: 'https://omnivore-basin-custody.ngrok-free.dev/pago-fallido',
-      pending: 'https://omnivore-basin-custody.ngrok-free.dev/pago-pendiente'
-    },
-    auto_return: 'approved',
-    external_reference: usuario_id.toString()
-  }
-});
+      body: {
+        items: items.map(item => ({
+          title: item.title,
+          quantity: Number(item.cantidad),
+          unit_price: Math.round(parseFloat(item.price)),
+          currency_id: 'COP'
+        })),
+        back_urls: {
+          success: 'https://omnivore-basin-custody.ngrok-free.dev/pago-exitoso',
+          failure: 'https://omnivore-basin-custody.ngrok-free.dev/pago-fallido',
+          pending: 'https://omnivore-basin-custody.ngrok-free.dev/pago-pendiente'
+        },
+        auto_return: 'approved',
+        external_reference: usuario_id.toString()
+      }
+    });
+
     res.json({ init_point: response.init_point });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -41,14 +42,12 @@ router.post('/webhook', async (req, res) => {
 
   if (type === 'payment') {
     try {
-      const { Payment } = require('mercadopago');
       const payment = new Payment(client);
       const pagoInfo = await payment.get({ id: data.id });
 
       if (pagoInfo.status === 'approved') {
         const usuario_id = pagoInfo.external_reference;
 
-        // Obtener items del carrito
         db.query(
           `SELECT c.*, j.price FROM carrito c 
            INNER JOIN juegos j ON c.juego_id = j.id 
@@ -57,10 +56,8 @@ router.post('/webhook', async (req, res) => {
           async (err, items) => {
             if (err || items.length === 0) return res.sendStatus(200);
 
-            // Calcular total
             const total = items.reduce((acc, item) => acc + parseFloat(item.price) * item.cantidad, 0);
 
-            // Crear recibo
             db.query(
               'INSERT INTO recibos (usuario_id, total) VALUES (?, ?)',
               [usuario_id, total],
@@ -68,7 +65,6 @@ router.post('/webhook', async (req, res) => {
                 if (err) return res.sendStatus(200);
                 const recibo_id = reciboResult.insertId;
 
-                // Registrar compras
                 items.forEach(item => {
                   const precio_total = parseFloat(item.price) * item.cantidad;
                   db.query(
@@ -81,7 +77,6 @@ router.post('/webhook', async (req, res) => {
                   );
                 });
 
-                // Vaciar carrito
                 db.query('DELETE FROM carrito WHERE usuario_id = ?', [usuario_id]);
               }
             );
@@ -94,25 +89,6 @@ router.post('/webhook', async (req, res) => {
   }
 
   res.sendStatus(200);
-});
-
-const response = await preference.create({
-  body: {
-    items: items.map(item => ({
-      title: item.title,
-      quantity: Number(item.cantidad),
-      unit_price: Math.round(parseFloat(item.price)),
-      currency_id: 'COP'
-    })),
-    back_urls: {
-      success: 'https://omnivore-basin-custody.ngrok-free.dev/pago-exitoso',
-      failure: 'https://omnivore-basin-custody.ngrok-free.dev/pago-fallido',
-      pending: 'https://omnivore-basin-custody.ngrok-free.dev/pago-pendiente'
-    },
-    auto_return: 'approved',
-    external_reference: usuario_id.toString(),
-    notification_url: 'https://TU_URL_NGROK_BACKEND/pagos/webhook'
-  }
 });
 
 module.exports = router;
