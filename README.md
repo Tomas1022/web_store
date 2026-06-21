@@ -1,4 +1,3 @@
-# 🎮 Tienda de Juegos
 
 Plataforma full-stack de e-commerce para videojuegos, con autenticación avanzada, pagos reales y panel administrativo completo.
 
